@@ -3,121 +3,122 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Principal;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
+package ventana;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javafx.scene.layout.Border;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.BevelBorder;
-
+import java.beans.PropertyChangeListener;
+import javax.swing.*;
 /**
  *
- * @author pc
+ * @author jonathanmiranda
  */
-public class Ventana extends JFrame implements ActionListener {
-    private static final long serialVersionUID = 1L;
-    private JLabel[] etiquetas;
-    private JTextField[] entradas;
-    private JTextField entrada;
-    private JTextArea salida;
-
-    public Ventana(int cantidadEstados, int cantidadSimbolos){
-        //Establecemos las propiedades de nuestro Frame
-        super("Nuevo Autómata");
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setBounds(400, 70, 500, 370);
-//        this.setResizable(false);
-        //Creamos un panel para agregar todos nuestros objetos
-        JPanel todo=(JPanel)this.getContentPane();
-        todo.setLayout(new GridLayout(3,5));
-        // Para cada estado se deben definir las 'cantidadSimbolos' de transiciones, y también su tipo (aceptable o no aceptable)
-        int cantidadEntradas = (cantidadSimbolos + 1)*cantidadEstados;
-        JPanel[] cabecera = new JPanel[5];
-        for(int i=0; i<5; i++) {cabecera[i] = new JPanel(); cabecera[i].setBackground(Color.ORANGE); }
-        JPanel columna_etiquetas = new JPanel();
-        JPanel columna_entradas = new JPanel();
-        JPanel columna_vacia = new JPanel();
-        JPanel columna_vacia2 = new JPanel();
-        //panelEntradas.setLayout(new GridLayout(filas, columnas));
-        columna_vacia.setBackground(Color.yellow);
-        columna_vacia2.setBackground(Color.BLUE);
-        columna_etiquetas.setLayout(new GridLayout(cantidadEntradas, 1));
-        columna_entradas.setLayout(new GridLayout(cantidadEntradas, 1));
+public class Ventana implements ActionListener{
+    JPanel panel1, panel2;
+    JLabel[] etiquetas;
+    JTextField[] cajas;
+    JButton guardar;
+    JFrame vent;
+    int cant, est, calf;
+    String[] alf;
+    public Boolean[] estados;
+    public String[] transiciones;
+    public Ventana(int estado, String[] alfabeto){
+        vent = new JFrame("Ventana java");
+        vent.setLayout(null);
+        cant = (estado*alfabeto.length)+estado;
+        est=estado;
+        calf=alfabeto.length;
+        alf=alfabeto;
+        Panel1();
+        Panel2();
         
-        etiquetas = new JLabel[cantidadEntradas];
-        entradas = new JTextField[cantidadEntradas];
-        for(int i=0; i<cantidadEntradas; i++) {
-            etiquetas[i] = new JLabel("Etiqueta "+(i+1));
-            etiquetas[i].setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-            etiquetas[i].setForeground(Color.BLUE);
-            columna_etiquetas.add(etiquetas[i]);
-            entradas[i] = new JTextField();
-            entradas[i].setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-            entradas[i].setForeground(Color.BLUE);
-//            entradas[i].setSize(50, 25);
-//            entradas[i].setLocation(100, 10+i*30);
-            columna_entradas.add(entradas[i]);
-        }
-        for(int i=0; i<5; i++) {
-            JLabel label = new JLabel("Hola "+(i+1));
-            cabecera[i].add(label, BorderLayout.WEST);
-        }
-        for(int i=0; i<5; i++) {
-            todo.add(cabecera[i], BorderLayout.WEST);
-        }
-        todo.add(columna_vacia, BorderLayout.WEST);
-        todo.add(columna_etiquetas, BorderLayout.WEST);
-        todo.add(columna_entradas, BorderLayout.WEST);
-        todo.add(columna_vacia2, BorderLayout.WEST);
-        for(int i=0; i<5; i++) {
-            JLabel label = new JLabel("Hola "+(i+1));
-            cabecera[i].add(label, BorderLayout.WEST);
-            cabecera[i].setBackground(Color.RED);
-        }
+        
+        panel1.setBounds(10, 10, 200, 30*cant);
+        panel2.setBounds(210, 10, 200, 30*cant);
+        vent.add(panel1);
+        vent.add(panel2);
+        guardar = new JButton("Guardar");
+        guardar.addActionListener(this);
+        guardar.setBounds(175, 20+(30*cant), 100, 30);
+        vent.add(guardar);
+        
+        
+        vent.setLocation(100,50);
+        //vent.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        vent.setSize(450, 80+(30*cant));
+        vent.setResizable(false);
+        vent.setVisible(true);
+        
     }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        //Obtenemos el primer caracter del nombre del boton clickeado
-        char caracter=((JButton) actionEvent.getSource()).getText().charAt(0);
-        //Dependiendo del caracter, procedemos a hacer los procedimientos correspondientes
-        switch(caracter){
-        case 'C':
-            JOptionPane.showMessageDialog(null, "Se presionó 'Comprimir'","Aviso",JOptionPane.INFORMATION_MESSAGE);
-            //obtenemos el texto ingresado en la caja de texto
-            String texto=entrada.getText();
-            //Verificamos que la cadena no sea nula, si lo es se lanza una excepcion
-            if(texto.length()==0){
-                JOptionPane.showMessageDialog(null, "Error. No hay datos que comprimir","Error",JOptionPane.ERROR_MESSAGE);
+    public void Panel1(){
+        panel1 = new JPanel(new GridLayout(cant, 1, 5, 7));
+        
+        etiquetas = new JLabel[cant];
+        
+        int cont=0, cont2=0;
+        etiquetas[0] = new JLabel("El estado S"+0+" es Final (si o no)");
+        panel1.add(etiquetas[0]);
+        for (int i = 1; i < cant; i++) {
+            if (cont < calf){
+                etiquetas[i] = new JLabel("(S"+cont2+","+alf[cont]+ "). ejemplo s1");
+                System.out.println("(S"+cont2+","+alf[cont]+ "). ejemplo s1");
             }
-            //Utilizamos la funcion comprimir del objeto winzip y le pasamos la cadena a comprimir
-            String[] cadenas={"Hola","Mundo"};
-            //Mostramos la cadena de direcciones y la cadena de bytes
-            salida.setText("Direcciones: "+cadenas[0]+"\nCaracteres: "+cadenas[1]);
-        break;
-        case 'D':
-            entrada.setText("");
-            //Utilizamos la funcion descomprimir de la clase Winzip
-            salida.setText("El mensaje original es: ");
-        break;
-        case 'L':
-            //Limpiamos las cajas de texto
-            salida.setText("");
-            entrada.setText("");
-        break;
+            if (cont >= calf){
+                cont2++;
+                etiquetas[i] = new JLabel("El estado S"+cont2+" es Final (si o no)");
+                System.out.println("El estado S"+cont2+" es Final (si o no)");
+                cont=-1;
+            }
+            cont++;
+            panel1.add(etiquetas[i]);
         }
+        panel1.setVisible(true);
+    }
+    public void Panel2(){
+        panel2 = new JPanel(new GridLayout(cant, 1, 5, 7));
+        
+        cajas = new JTextField[cant];
+        for (int i = 0; i < cant; i++) {
+            cajas[i] = new JTextField();
+            panel2.add(cajas[i]);
+        }
+        panel2.setVisible(true);
+    }
+    public void Datos(){
+        estados= new Boolean[est];
+        transiciones = new String[est*calf];
+        int cont=0;
+        for (int i = 0; i < cant; i+=(calf+1)) {
+            if (cajas[i].getText().equals("si")){
+                estados[cont]=true;
+            }else{
+                estados[cont]=false;
+            }
+            cont++;
+        }
+        cont=0;
+        int cont2=0;
+        for (int i = 1; i < cant; i++) {
+            if(cont2<calf){
+                transiciones[cont]=cajas[i].getText();
+                cont++;
+            }else cont2 = -1;
+                   cont2++;
+        }
+        for (Boolean estado : estados) {
+            System.out.print(estado + ", ");
+        }
+        
+        for (String transicione : transiciones) {
+            System.out.print(transicione + ", ");
+        }
+
+        //vent.dispose();
+    }
+    @Override
+    public void actionPerformed(ActionEvent e) {  
+        Datos();
     }
 }
