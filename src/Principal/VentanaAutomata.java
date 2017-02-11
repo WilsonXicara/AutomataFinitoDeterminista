@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package Principal;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,6 +34,7 @@ public class VentanaAutomata implements ActionListener {
     
     /* Definición de otras variables */
     int cantidadEstados, cantidadSimbolos;
+    String mensaje_error;
     String[] alfabeto, estados;
     
     public VentanaAutomata(int cantidadEstados, int cantidadSimbolos){
@@ -176,38 +176,40 @@ public class VentanaAutomata implements ActionListener {
         
         ventana.add(titulo_transiciones);
     }
-    private boolean esAlfabetoValido(String mensaje) {
+    private boolean esAlfabetoValido() {
         for(int cont=0; cont<cantidadSimbolos; cont++) {
             String simbolo = cajas_alfabeto[cont].getText();   // Obtengo el i-esimo simbolo
             if (simbolo.length() == 0) {
-                mensaje+="\nNo puede definir el Símbolo "+(cont+1)+" como nulo";
+                mensaje_error+="\nNo puede definir el Símbolo "+(cont+1)+" como nulo";
                 return false;
             }
             else if (simbolo.length() > 1) {
-                mensaje+="\nNo puede definir el Símbolo "+(cont+1)+" con más de un caracter";
+                mensaje_error+="\nNo puede definir el Símbolo "+(cont+1)+" con más de un caracter";
                 return false;
             }
             for(int cont2=cont+1; cont2<cantidadSimbolos; cont2++) {
                 String simbolo2 = cajas_alfabeto[cont2].getText();
                 if (simbolo2.equals(simbolo) == true) {
-                    mensaje+="\nLos Símbolos "+(cont+1)+" y "+(cont2+1)+" son iguales";
+                    mensaje_error+="\nLos Símbolos "+(cont+1)+" y "+(cont2+1)+" son iguales";
                     return false;
                 }
             }
         }
         return true;
     }
-    private boolean sonEstadosValidos(String mensaje) {
+    private boolean sonEstadosValidos() {
         for(int cont=0; cont<cantidadEstados; cont++) {
             String estado = cajas_estados[cont].getText();
             if (estado.length() == 0) {
-                mensaje+="\n";
+                mensaje_error+="\nNo puede definir el Estado "+(cont+1)+" como nulo";
                 return false;
             }
             for(int cont2=cont+1; cont2<cantidadEstados; cont2++) {
                 String estado2 = cajas_estados[cont2].getText();
-                if (estado2.equals(estado) == true)
+                if (estado2.equals(estado) == true) {
+                    mensaje_error+="\nLos Estados "+(cont+1)+" y "+(cont2+1)+"son iguales";
                     return false;
+                }
             }
         }
         return true;
@@ -216,11 +218,11 @@ public class VentanaAutomata implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         // Cuando se quiere guardar el alfabeto: inicio la commprobación del mismo
         if (e.getSource() == guardar_alfabeto_estados) {
-            String mensaje = "Error.";
-            boolean alfabetoValido = esAlfabetoValido(mensaje);
-            boolean estadosValidos = sonEstadosValidos(mensaje);
+            mensaje_error = "Error.\n";
+            boolean alfabetoValido = esAlfabetoValido();
+            boolean estadosValidos = sonEstadosValidos();
             if (alfabetoValido == false || estadosValidos == false) {
-                JOptionPane.showMessageDialog(ventana, mensaje, "Error en Alfabeto o Estadeos", JOptionPane.ERROR_MESSAGE, null);
+                JOptionPane.showMessageDialog(ventana, mensaje_error, "Error en Alfabeto o Estadeos", JOptionPane.ERROR_MESSAGE, null);
             }
             else {
                 JOptionPane.showMessageDialog(ventana, "Alfabeto y Estados correctos", "Alfabeto y Estados guardado", JOptionPane.INFORMATION_MESSAGE, null);
