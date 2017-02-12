@@ -22,11 +22,51 @@ import java.util.logging.Logger;
  * @author Wilson Xicará
  */
 public class Automata {
-    private String[] alfabeto;
+    private String nombre;
+    private String[] alfabeto, nombresEstados;
     private Estado[] estados;
     private int cantidadSimbolos, cantidadEstados;
     
     public Estado[] getEstados() { return this.estados; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public int getLongitudNombreEstados() {
+        int longitud = nombresEstados[0].length();
+        for(int i=1; i<cantidadEstados; i++) {
+            if (nombresEstados[i].length() > longitud)
+                longitud = nombresEstados[i].length();
+        }
+        return longitud;
+    }
+    public int getCantidadEstados() { return cantidadEstados; }
+    public String[] getNombresEstados() { return nombresEstados; }
+    public int getIndiceEstadoInicial() {
+        Estado iterador;
+        for(int indice=0; indice<cantidadEstados; indice++) {
+            iterador = estados[indice];
+            if (iterador == getEstadoInicial())
+                return indice;
+        }
+        return 0;
+    }
+    public int[][] getMatrizTransiciones() {
+        int[][] matriz = new int[cantidadEstados][cantidadSimbolos];
+        Estado iterador, siguiente;
+        for(int fil=0; fil<cantidadEstados; fil++) {
+            iterador = estados[fil];
+            for(int col=0; col<cantidadSimbolos; col++) {
+                siguiente = iterador.siguienteEstado(col);
+                for(int busc=0; busc<cantidadEstados; busc++) {
+                    if (estados[busc] == siguiente) {
+                        matriz[fil][col] = busc;
+                        busc = cantidadEstados;
+                    }
+                }
+                
+            }
+        }
+        return matriz;
+    }
     
     /**
      * Constructor que inicializa un Autómata vacío (esto es, un alfabeto vacío y cero estados).
