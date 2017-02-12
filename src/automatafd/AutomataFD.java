@@ -67,21 +67,9 @@ public class AutomataFD {
         int longitud = cadena.length();
         for(int i=0; i<(8-longitud); i++) cadena = (char)0+cadena;
         System.out.println("Cadena modificada = "+cadena);
-        try {
-            String finArchivo = ""+(char)0xFF+(char)0xFF;
-            RandomAccessFile archivo = new RandomAccessFile("C:\\Users\\pc\\Desktop\\SistemaSeguridad_3bits", "rw");
-            int cantidad = 1;
-            System.out.println("Cantidad = "+cantidad);
-            cantidad+= archivo.skipBytes(5);
-            System.out.println("Cantidad = "+cantidad+", con skiyBytes(5)");
-            System.out.println("skipBytes(10) = "+archivo.skipBytes(10));
-            System.out.println("0xFFFF = '"+finArchivo+"'");
-            archivo.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(AutomataFD.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AutomataFD.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        String[] alfabeto = new String[5];
+        for(int i=0; i<5; i++) alfabeto[i] = Integer.toString(i);
+        for(int i=0; i<5; i++) System.out.println("Alfabeto["+i+"] = '"+alfabeto[i]+"'");
     }
     
     public static void compararAutomatas(Automata A1, Automata A2) {

@@ -127,8 +127,45 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Nuevo_automataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Nuevo_automataActionPerformed
-          aux = new Ventana_crear_Automata();
-          Automata nuevo = aux.getAutomata().getNuevo();
+//          aux = new Ventana_crear_Automata();
+//          Automata nuevo = aux.getAutomata().getNuevo();
+        String[] alfabeto = {"0", "1"}, nombresEstados = {"s000", "s1", "s2"};
+        Automata nuevo = new Automata(alfabeto, 3);
+        nuevo.setNombre("Primer Automata");
+        nuevo.setDescripcion("ESTE ES EL PRIMER AUTÓMATA");
+        nuevo.setNombresEstados(nombresEstados);
+        nuevo.getEstados()[0].setAceptable(false);
+        nuevo.getEstados()[0].setTransicion(0, nuevo.getEstados()[1]);
+        nuevo.getEstados()[0].setTransicion(1, nuevo.getEstados()[0]);
+        nuevo.getEstados()[1].setAceptable(false);
+        nuevo.getEstados()[1].setTransicion(0, nuevo.getEstados()[1]);
+        nuevo.getEstados()[1].setTransicion(1, nuevo.getEstados()[2]);
+        nuevo.getEstados()[2].setAceptable(true);
+        nuevo.getEstados()[2].setTransicion(0, nuevo.getEstados()[1]);
+        nuevo.getEstados()[2].setTransicion(1, nuevo.getEstados()[0]);
+        
+        Automata nuevo2 = new Automata(alfabeto, 3);
+        nuevo2.setNombre("segundo Automata");
+        nuevo2.setDescripcion("ESTE ES EL SEGUNDO AUTÓMATA, QUE SE GUARDA DESPUÉS DEL PRIMERO");
+        nuevo2.setNombresEstados(nombresEstados);
+        nuevo2.getEstados()[0].setAceptable(false);
+        nuevo2.getEstados()[0].setTransicion(0, nuevo2.getEstados()[1]);
+        nuevo2.getEstados()[0].setTransicion(1, nuevo2.getEstados()[0]);
+        nuevo2.getEstados()[1].setAceptable(false);
+        nuevo2.getEstados()[1].setTransicion(0, nuevo2.getEstados()[1]);
+        nuevo2.getEstados()[1].setTransicion(1, nuevo2.getEstados()[2]);
+        nuevo2.getEstados()[2].setAceptable(true);
+        nuevo2.getEstados()[2].setTransicion(0, nuevo2.getEstados()[1]);
+        nuevo2.getEstados()[2].setTransicion(1, nuevo2.getEstados()[0]);
+        
+          ManejoArchivo archivo = new ManejoArchivo();
+          archivo.guardarAutomata(nuevo);
+          archivo.guardarAutomata(nuevo2);
+          IndiceAutomatas[] referencias = archivo.obtenerReferencias();
+          System.out.println("IndiceAutomatas[0] = "+referencias[0].toString());
+          System.out.println("IndiceAutomatas[1] = "+referencias[1].toString());
+          archivo.eliminarAutomata(referencias[1]);
+//          archivo.eliminarAutomata(referencias[1]);
           Lista_Automatas.add(nuevo);
           Automatas1.addItem(nuevo.getNombre());
           Automatas2.addItem(nuevo.getNombre());

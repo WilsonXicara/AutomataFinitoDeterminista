@@ -86,9 +86,8 @@ public class ManejoArchivo {
      * autómatas guardados en el archivo, no se guardarán los datos de 'nuevo'; de lo contrario, se escriben todos los
      * datos de 'nuevo' y se actualizan todos los registros necesarios en el archivo.
      * @param nuevo objeto de tipo Automata que contiene los datos del nuevo autómata que se quiere guardar.
-     * @param descripcionNuevo información del autómata 'nuevo'
      */
-    public void guardarAutomata(Automata nuevo, String descripcionNuevo) {
+    public void guardarAutomata(Automata nuevo) {
         RandomAccessFile archivo;
         try {
             int numeroRegistro = 0;
@@ -98,6 +97,7 @@ public class ManejoArchivo {
             for(int i=0; i<3; i++) tipo+= (char)Byte.toUnsignedInt(archivo.readByte());
             // Compruebo si es el archivo Automatas_Estado-Finito/AFD/Automatas.afd
             if ("AFD".equals(firma) == true && "dat".equals(tipo) == true) {
+                String descripcionNuevo = nuevo.getDescripcion();
                 int punteroAlIndice = Short.toUnsignedInt(archivo.readShort()); // Obtengo el Puntero al Índice
                 archivo.seek(punteroAlIndice);      // Salto hasta el Índice
                 int cantidadRegistros = Byte.toUnsignedInt(archivo.readByte()); // Obtengo la Cantidad de Registros
@@ -105,7 +105,7 @@ public class ManejoArchivo {
                 /* La escritura del nuevo Autómata consiste en cuatro pasos: */
                 /** Paso 1: Verificación de su existencia (en el Índice de Referencias a Registros). **/
                 boolean yaExiste = false;
-                int comparacion = 0, punteroADatos = 0;
+                int comparacion = -1, punteroADatos = 8;
                 long posicionInicioReferencia = archivo.getFilePointer();   // Obtengo la posición del primer registro en Índice
                 for(int cont=0; cont<cantidadRegistros; cont++) {
                     numeroRegistro = cont;
@@ -126,10 +126,10 @@ public class ManejoArchivo {
                 // Debido a que debo actualizar (cantidadRegistros - numeroRegistro) referencias, verifico si 'nuevo' no se
                 // ingresará al final del archivo ya que de así ser debería actualizar(cantidadRegistros - numeroRegistro = 1
                 // referencias cuando en realidad debo actualizar cero referencias. Por eso, le sumo 1 de ser el caso
-                if (numeroRegistro == (cantidadRegistros - 1) && comparacion == -1) {
+                if (numeroRegistro == (cantidadRegistros - 1) && comparacion == -1 && cantidadRegistros != 0) {
                     numeroRegistro++;
                     // La nueva referencia irá casi al final del archivo (en el penúltimo byte, antes de 'F')
-                    posicionInicioReferencia = archivo.length() - 1;
+                    posicionInicioReferencia = archivo.length() - 2;
                     // El nuevo registro empezará en donde está actualmente el Índice
                     punteroADatos = punteroAlIndice;
                 }
@@ -163,7 +163,7 @@ public class ManejoArchivo {
                     
                     // Modifico la Cantidad de Registros en el Índice
                     archivo.seek(punteroAlIndice);
-                    archivo.writeByte(cantidadRegistros++);
+                    archivo.writeByte(cantidadRegistros + 1);
                     
                     /** Paso 3: Escritura del nuevo registro en el archivo y actualización del Puntero al Índice. **/
                     // 'posicionInicioReferencia' contiene el puntero en el archivo donde se debe ecribir la referencia de nuevo
@@ -187,7 +187,7 @@ public class ManejoArchivo {
                     for(int i=0; i<cantidadEstados; i++) {   // Escritura de los Nombres de los Estados de 'nuevo'
                         int longitud = auxArrayString[i].length();
                         // Si el nombre tiene menos caracteres del que debería, le concateno (char)0 al inicio los que necesite.
-                        for(int j=0; j<(longitudNombres-longitud); i++)
+                        for(int j=0; j<(longitudNombres-longitud); j++)
                             auxArrayString[i] = (char)0 + auxArrayString[i];
                         archivo.writeBytes(auxArrayString[i]);  // Escritura del Nombre del i-ésimo estado
                     }
@@ -220,16 +220,15 @@ public class ManejoArchivo {
                         archivo.seek(punteroAlIndice);  // Me muevo hasta el Índice
                         cantidadRegistros = Byte.toUnsignedInt(archivo.readByte()); // Obtengo la Cantidad de Registros
                         archivo.seek(archivo.getFilePointer() - 1); // Regreso nuevamente al inicio del Índice
-                        archivo.writeByte(cantidadRegistros++);   // Aumento la Cantidad de Registros
+                        archivo.writeByte(cantidadRegistros + 1);   // Aumento la Cantidad de Registros
                         
                         // Me desplazo hasta la referencia del 'numeroRegistro'-ésimo registro en el Índice
                         if (comparacion == -1) {    // Si 'nuevo' irá de último
                             // La nueva referencia irá casi al final del archivo (en el penúltimo byte, antes de 'F')
-                            posicionInicioReferencia = archivo.length() - 1;
+                            posicionInicioReferencia = archivo.length() - 2;
                             // El nuevo registro empezará en donde está actualmente el Índice
                             punteroADatos = punteroAlIndice;
-                        }
-                        else {
+                        } else {
                             archivo.skipBytes(2*numeroRegistro);    // Si 'nuevo' no irá de último
                             posicionInicioReferencia = archivo.getFilePointer();
                             punteroADatos = Short.toUnsignedInt(archivo.readShort());
@@ -269,23 +268,19 @@ public class ManejoArchivo {
                         archivo.writeShort(punteroAlIndice + 1 + descripcionNuevo.length());
                         
                         archivo.close();    // Cierro el archivo.
-                    }
-                    else {
+                    } else {
                         String mensajeError = "El guardará el autómata '"+nuevo.getNombre()+"', pero no su descripción (No se encontró el archivo).";
                         JOptionPane.showMessageDialog(null, mensajeError, "Error!", JOptionPane.ERROR_MESSAGE, null);
                     }
-                }
-                else {
+                } else {
                     String mensajeError = "El autómata '"+nuevo.getNombre()+"' ya existe.";
                     if (cantidadRegistros == 255)
                         mensajeError = "Se ha llegado al número máximo de autómatas que puede guardar.";
                     JOptionPane.showMessageDialog(null, mensajeError, "Error!", JOptionPane.ERROR_MESSAGE, null);
                 }
-            }   // Hasta aquí se garantiza la inserción al archivo del Autómata 'nuevo'
-            else {
+            } else {
                 JOptionPane.showMessageDialog(null, "No se encontró el archivo", "Error!", JOptionPane.ERROR_MESSAGE, null);
-            }
-            
+            }   // Hasta aquí se garantiza la inserción (o no inserción) al archivo del Autómata 'nuevo'
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -324,7 +319,7 @@ public class ManejoArchivo {
                 archivo.setLength(archivo.length() - longReferencia);   // Acorto el tamaño del archivo
                 // Inicio la actualización de los Punteros de las demas Referencias en el Índice
                 int longNombre = Byte.toUnsignedInt(archivo.readByte());
-                while ((byte)longNombre != 0xFF) {   // Mientras no se llegue al final del archivo
+                while (longNombre != 255) {   // Mientras no se llegue al final del archivo
                     archivo.skipBytes(longNombre);  // Salto los bytes del Nombre
                     int punteroActual = Short.toUnsignedInt(archivo.readShort());   // Obtengo el Puntero actual de la Referencia
                     archivo.seek(archivo.getFilePointer() - 2);     // Regreso al inicio del Puntero Actual
@@ -356,7 +351,7 @@ public class ManejoArchivo {
             for(int i=0; i<3; i++) firma+= (char)Byte.toUnsignedInt(archivo.readByte());
             for(int i=0; i<3; i++) tipo+= (char)Byte.toUnsignedInt(archivo.readByte());
             if ("AFD".equals(firma) == true && "inf".equals(tipo) == true && eliminado == true) {
-                int punteroAlIndice = Byte.toUnsignedInt(archivo.readByte());   // Obtengo el Puntero al Índice
+                int punteroAlIndice = Short.toUnsignedInt(archivo.readShort());   // Obtengo el Puntero al Índice
                 archivo.seek(punteroAlIndice);  // Me muevo hasta el puntero al Índice
                 int cantidadRegistros = Byte.toUnsignedInt(archivo.readByte()); // Obtengo la Cantidad de Registros
                 archivo.seek(archivo.getFilePointer() - 1);
@@ -372,7 +367,7 @@ public class ManejoArchivo {
                 archivo.setLength(archivo.length() - 2);    // Acorto el tamaño del archivo (que borra la referencia)
                 // Actualización de las Referencias siguientes al de 'eliminado'
                 int punteroActual = Short.toUnsignedInt(archivo.readShort());
-                while (punteroActual != 0xFFFF) {
+                while (punteroActual != 65535) {
                     archivo.seek(archivo.getFilePointer() - 2);
                     archivo.writeShort(punteroActual - 1 - eliminar.getDescripcion().length()); // Modifico el i-ésimo puntero
                     punteroActual = Short.toUnsignedInt(archivo.readShort());   // Obtengo el (i+1)-ésimo puntero
@@ -401,9 +396,9 @@ public class ManejoArchivo {
             Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void modificarAutomata(IndiceAutomatas original, Automata modificado, String descripcionModificado) {
+    public void modificarAutomata(IndiceAutomatas original, Automata modificado) {
         eliminarAutomata(original);
-        guardarAutomata(modificado, descripcionModificado);
+        guardarAutomata(modificado);
     }
     public IndiceAutomatas[] obtenerReferencias() {
         IndiceAutomatas[] referencias = null;
@@ -427,6 +422,7 @@ public class ManejoArchivo {
                     int longitudNombre = Byte.toUnsignedInt(archivo.readByte());    // Obtengo la longitud del i-ésimo nombre
                     String nombre = "";     // Obtengo el i-ésimo nombre
                     for(int i=0; i<longitudNombre; i++) nombre+= (char)Byte.toUnsignedInt(archivo.readByte());
+                    referencias[cont].setNombreAutomata(nombre);
                     referencias[cont].setPunteroADatos(Short.toUnsignedInt(archivo.readShort()));   // Obtengo el Puntero a Datos
                 }   // Hasta aquí se garantiza la extracción de las referencias de los datos de los autómatas
                 archivo.close();    // Cierro el archivo
@@ -468,6 +464,61 @@ public class ManejoArchivo {
         }
         
         return referencias;
+    }
+    public Automata cargarAutomata(IndiceAutomatas referencia) {
+        // Una parte de la información del Autómata que se cargará está en 'referencia'
+        Automata nuevo = null;
+        RandomAccessFile archivo;
+        try {
+            /** Extracción de los datos del Autómata en Automatas_Estado-Finito/AFD/Automatas.afd **/
+            archivo = new RandomAccessFile(CARPETA_AFD + SEPARADOR + "Automatas.afd", "rw");
+            String firma = "", tipo = "";
+            for(int i=0; i<3; i++) firma+= (char)Byte.toUnsignedInt(archivo.readByte());
+            for(int i=0; i<3; i++) tipo+= (char)Byte.toUnsignedInt(archivo.readByte());
+            if ("AFD".equals(firma) == true && "dat".equals(tipo) == true) {
+                /* Ya no es necesario realizar búsqueda pues los datos de referencia al Autómata que se quiere cargar están
+                   en 'referencia'. Así que, voy directamente a los datos. La Descripción del Autómata está en 'referencia' */
+                nuevo = new Automata();
+                // Extracción de datos
+                archivo.seek(referencia.getPunteroADatos());    // Salto al inicio de los datos
+                int cantidadSimbolos = Byte.toUnsignedInt(archivo.readByte());  // Obtengo la Cantidad de Símbolos
+                String[] alfabeto = new String[cantidadSimbolos];
+                for(int i=0; i<cantidadSimbolos; i++)   // Obtengo el Alfabeto
+                    alfabeto[i] = ""+(char)Byte.toUnsignedInt(archivo.readByte());
+                int cantidadEstados = Byte.toUnsignedInt(archivo.readByte());   // Obtengo la Cantidad de Estados
+                nuevo.setAlfabeto(alfabeto);    // Inserto el Alfabeto en el Autómata
+                nuevo.setCantidadEstados(cantidadEstados);  // Inserto la Cantidad de Estados en el Autómata
+                int longNombreEstados = Byte.toUnsignedInt(archivo.readByte()); // Obtengo la cantidad de caracteres del nombre de los estados
+                String[] nombresEstados = new String[cantidadEstados];
+                for(int i=0; i<cantidadEstados; i++) {  // Inicio la extracción de los Nombres de los Estados
+                    nombresEstados[i] = "";
+                    for(int j=0; j<longNombreEstados; j++) {
+                        char caracter = (char)Byte.toUnsignedInt(archivo.readByte());   // Obtengo un caracter
+                        if ((int)caracter != 0)
+                            nombresEstados[i]+= caracter;
+                    }
+                }
+                nuevo.setNombresEstados(nombresEstados);
+                archivo.readByte();     // Lectura del Estado Inicial
+                for(int i=0; i<cantidadEstados; i++) {  // Extracción del Tipo de Estado y sus Transiciones
+                    nuevo.getEstados(i).setAceptable(archivo.readBoolean());    // Inserto el Tipo del i-ésimo Estado
+                    for(int j=0; j<cantidadSimbolos; j++) {
+                        nuevo.getEstados(i).setTransicion(j, nuevo.getEstados()[Byte.toUnsignedInt(archivo.readByte())]);
+                    }
+                }
+                // Hasta aquí se garantiza la extracción de los datos del Autómata en el archivo.
+                nuevo.setNombre(referencia.getNombreAutomata());
+                nuevo.setDescripcion(referencia.getDescripcion());
+                archivo.close();
+            } else {
+                JOptionPane.showMessageDialog(null, "No se encontró el archivo.", "Error!", JOptionPane.ERROR_MESSAGE, null);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return nuevo;
     }
     
     /**

@@ -22,13 +22,15 @@ import java.util.logging.Logger;
  * @author Wilson Xicará
  */
 public class Automata {
-    private String nombre;
+    private String nombre, descripcion;
     private String[] alfabeto, nombresEstados;
     private Estado[] estados;
     private int cantidadSimbolos, cantidadEstados;
     
     public Estado[] getEstados() { return this.estados; }
     public String getNombre() { return nombre; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getDescripcion() { return descripcion; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public int getLongitudNombreEstados() {
         if (nombresEstados[0].equals("") == true)
@@ -75,6 +77,7 @@ public class Automata {
         return matriz;
     }
     public void setEstados(Estado[] estados) { this.estados = estados; }
+    public void setNombresEstados(String[] nombresEstados) { this.nombresEstados = nombresEstados; }
     
     
     /**

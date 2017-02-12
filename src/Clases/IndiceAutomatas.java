@@ -13,6 +13,10 @@ public class IndiceAutomatas {
     private String nombreAutomata, descripcion;
     private int punteroARefDatos, punteroADatos, punteroARefDescripcion, punteroADescripcion;
     
+    @Override
+    public String toString() {
+        return "punteroARefDatos = "+punteroARefDatos+", punteroADatos = "+punteroADatos+", punteroARefDescripcion = "+punteroARefDescripcion+", punteroADescripcion = "+punteroADescripcion;
+    }
     public IndiceAutomatas() {
         nombreAutomata = "";
         descripcion = "<Sin descripción>";
