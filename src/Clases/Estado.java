@@ -14,6 +14,7 @@ package Clases;
 public class Estado {
     private boolean aceptable;
     private Estado[] transiciones;
+    private String simbolo;
 
     /**
      * Constructor que inicializa un estado vacío (con transiciones = null y aceptable = false).
@@ -50,6 +51,7 @@ public class Estado {
      * @return el arreglo de transiciones (que son otros estados).
      */
     public Estado[] getTransiciones() { return transiciones; }
+    public String getSimbolo() { return simbolo; }
 
     /**
      * Método que inserta el tipo de estado que es this ('true' si es aceptable, 'false' si es no aceptable).
@@ -62,6 +64,7 @@ public class Estado {
      * @param transicion estado al que se dirige el autómata desde this cuando sucede el par N*(this,alfabeto[indice]).
      */
     public void setTransicion(int indice, Estado transicion) { this.transiciones[indice] = transicion; }
+    public void setSimbolo(String simbolo) { this.simbolo = simbolo; }
     
     /**
      * Función que determina si dos estados, this y est, son equivalentes. "Dos estados son equivalentes si y sólo si ambos son

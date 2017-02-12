@@ -129,9 +129,9 @@ public class AutomataFD {
             System.out.println(automatas[1].toString());**/
                 
             String cadena, continuar = "s";
-            new Graficos("Original", automatas[0]);
+//            new Graficos("Original", automatas[0]);
             automatas[1] = automatas[0].minimizar();
-            new Graficos("Minimizado", automatas[1]);
+//            new Graficos("Minimizado", automatas[1]);
             while (continuar.equals("n") == false) {
                 System.out.print("Automata a utlilizar: ");  int numeroAutomata = Integer.parseInt(teclado.readLine());
                 System.out.print("Cadena a probar = ");  cadena = teclado.readLine();

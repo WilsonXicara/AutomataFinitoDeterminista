@@ -31,6 +31,8 @@ public class Automata {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public int getLongitudNombreEstados() {
+        if (nombresEstados[0].equals("") == true)
+            getNombresEstados();
         int longitud = nombresEstados[0].length();
         for(int i=1; i<cantidadEstados; i++) {
             if (nombresEstados[i].length() > longitud)
@@ -39,7 +41,12 @@ public class Automata {
         return longitud;
     }
     public int getCantidadEstados() { return cantidadEstados; }
-    public String[] getNombresEstados() { return nombresEstados; }
+    public String[] getNombresEstados() {
+        if (nombresEstados[0].equals("") == true)
+            for(int i=0; i<cantidadEstados; i++)
+                nombresEstados[i] = estados[i].getSimbolo();
+        return nombresEstados;
+    }
     public int getIndiceEstadoInicial() {
         Estado iterador;
         for(int indice=0; indice<cantidadEstados; indice++) {
@@ -67,13 +74,16 @@ public class Automata {
         }
         return matriz;
     }
+    public void setEstados(Estado[] estados) { this.estados = estados; }
+    
     
     /**
      * Constructor que inicializa un Autómata vacío (esto es, un alfabeto vacío y cero estados).
      */
     public Automata() {
-        this.alfabeto = null;
+        this.alfabeto = this.nombresEstados = null;
         this.estados = null;
+        this.nombre = null;
         this.cantidadSimbolos = this.cantidadEstados = 0;
     }
     /**
@@ -90,6 +100,8 @@ public class Automata {
         this.estados = new Estado[cantidadEstados];
         for(int i=0; i<cantidadEstados; i++)
             this.estados[i] = new Estado(this.cantidadSimbolos);
+        this.nombresEstados = new String[cantidadEstados];
+        for(int i=0; i<cantidadEstados; i++) this.nombresEstados[i] = "";
     }
     
     /**
