@@ -203,6 +203,7 @@ public class Automata {
         ArrayList actuales = new ArrayList<ArrayList>();
         ArrayList no_finales = new ArrayList<Estado>();
         ArrayList Finales = new ArrayList<Estado>();
+        // Obtención de las Clases de 0-equivalencia:
         for(Estado a : estados){
             if(a.esAceptable()==true)Finales.add(a);
             else no_finales.add(a);

@@ -5,11 +5,11 @@
  */
 package Clases;
 
-import automatafd.AutomataFD;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.Collator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -19,13 +19,12 @@ import javax.swing.JOptionPane;
  * @author Wilson Xicará
  */
 public class ManejoArchivo {
-    private String SEPARADOR;
-    private String CARPETA_PRINCIPAL, CARPETA_AFD, CARPETA_AFN;
+    private static String SEPARADOR = System.getProperty("file.separator");
+    public static final String CARPETA_PRINCIPAL = System.getProperty("user.home")+SEPARADOR+"Automatas_Estado-Finito";
+    public static final String CARPETA_AFD = CARPETA_PRINCIPAL + SEPARADOR + "AFD";
+    public static final String CARPETA_AFN = CARPETA_PRINCIPAL + SEPARADOR + "AFN";
+    public static final String CARPETA_IMAGENES = CARPETA_AFD + SEPARADOR + "IMAGENES";
     public ManejoArchivo() {
-        SEPARADOR = System.getProperty("file.separator");
-        CARPETA_PRINCIPAL = System.getProperty("user.home")+SEPARADOR+"Automatas_Estado-Finito";
-        CARPETA_AFD = CARPETA_PRINCIPAL + SEPARADOR + "AFD";
-        CARPETA_AFN = CARPETA_PRINCIPAL + SEPARADOR + "AFN";
         // Verifico la existencia de la carpeta principal. De no existir, la creo con los archivos sin registros.
         verificarArchivos();    // Crea las rutas y archivos necesarios, si estos no existen
     }
@@ -73,11 +72,15 @@ public class ManejoArchivo {
             archivo.writeBytes(finArchivo);    // Escritura del Indicador de Fin de Archivo
             archivo.close();
             
+            /* Creación del subdirectorio Automatas_Estado-Finito/AFD/Imagenes */
+            subdirectorio = new File(CARPETA_IMAGENES);
+            subdirectorio.mkdirs();
+            
             // HASTA AQUÍ SE GARANTIZA LA CREACIÓN DE TODOS LOS ARCHIVOS Y DIRECTORIOS NECESARIOS
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(AutomataFD.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(AutomataFD.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     /**
@@ -115,18 +118,21 @@ public class ManejoArchivo {
                     for(int i=0; i<longitudNombre; i++) nombre+= (char)Byte.toUnsignedInt(archivo.readByte());  // Obtengo el i-ésimo nombre
                     punteroADatos = Short.toUnsignedInt(archivo.readShort());   // Obtengo el puntero del i-ésimo registro
                     
-                    comparacion = compararCadenaPorOrden(nombre, nuevo.getNombre());
+                    Collator comparador = Collator.getInstance();
+                    comparador.setStrength(Collator.TERTIARY);
+                    comparacion = comparador.compare(nombre, nuevo.getNombre());
+//                    comparacion = compararCadenaPorOrden(nombre, nuevo.getNombre());
                     if (comparacion == 0) { // Si nuevo.getNombreAutomata() ya existe, finalizo el for y no se escribirá
                         yaExiste = true;
                         cont = cantidadRegistros;
                     }
-                    if (comparacion == 1)   // Si nuevo.getNombreAutomta() < nombre, nuevo se insertará antes de 'nombre'
+                    if (comparacion > 0)   // Si nuevo.getNombreAutomta() < nombre, nuevo se insertará antes de 'nombre'
                         cont = cantidadRegistros;
                 }   // Al salir, 'posicionInicioReferencia' y 'punteroADatos' definirán las posiciones de la nueva referencia
                 // Debido a que debo actualizar (cantidadRegistros - numeroRegistro) referencias, verifico si 'nuevo' no se
                 // ingresará al final del archivo ya que de así ser debería actualizar(cantidadRegistros - numeroRegistro = 1
                 // referencias cuando en realidad debo actualizar cero referencias. Por eso, le sumo 1 de ser el caso
-                if (numeroRegistro == (cantidadRegistros - 1) && comparacion == -1 && cantidadRegistros != 0) {
+                if (numeroRegistro == (cantidadRegistros - 1) && comparacion < 0 && cantidadRegistros != 0) {
                     numeroRegistro++;
                     // La nueva referencia irá casi al final del archivo (en el penúltimo byte, antes de 'F')
                     posicionInicioReferencia = archivo.length() - 2;
@@ -223,7 +229,7 @@ public class ManejoArchivo {
                         archivo.writeByte(cantidadRegistros + 1);   // Aumento la Cantidad de Registros
                         
                         // Me desplazo hasta la referencia del 'numeroRegistro'-ésimo registro en el Índice
-                        if (comparacion == -1) {    // Si 'nuevo' irá de último
+                        if (comparacion < 0) {    // Si 'nuevo' irá de último
                             // La nueva referencia irá casi al final del archivo (en el penúltimo byte, antes de 'F')
                             posicionInicioReferencia = archivo.length() - 2;
                             // El nuevo registro empezará en donde está actualmente el Índice
@@ -287,6 +293,7 @@ public class ManejoArchivo {
             Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    @SuppressWarnings("empty-statement")
     public void eliminarAutomata(IndiceAutomatas eliminar) {
         RandomAccessFile archivo;
         try {
@@ -390,6 +397,10 @@ public class ManejoArchivo {
             } else {
                 JOptionPane.showMessageDialog(null, "No se puede encontró la informaicón de '"+eliminar.getNombreAutomata()+"'.", "Error!", JOptionPane.ERROR_MESSAGE, null);
             }
+            
+            /* Eliminación de la Imagen asociada a Automata */
+            File imagen = new File(CARPETA_IMAGENES + SEPARADOR + eliminar.getNombreAutomata() + ".png");
+            while (imagen.delete() == false);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ManejoArchivo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -413,8 +424,10 @@ public class ManejoArchivo {
                 int punteroAlIndice = Short.toUnsignedInt(archivo.readShort()); // Obtengo el Puntero al Índice
                 archivo.seek(punteroAlIndice);  // Me muevo hasta el Índice
                 int cantidadaRegistros = Byte.toUnsignedInt(archivo.readByte());    // Obtengo la Cantidad de Registros
-                referencias = new IndiceAutomatas[cantidadaRegistros];  // Inicializo el arreglo de referenecias
-                for(int i=0; i<cantidadaRegistros; i++) referencias[i] = new IndiceAutomatas();
+                if (cantidadaRegistros != 0) {
+                    referencias = new IndiceAutomatas[cantidadaRegistros];  // Inicializo el arreglo de referenecias
+                    for(int i=0; i<cantidadaRegistros; i++) referencias[i] = new IndiceAutomatas();
+                }
                 
                 // Inicio la extracción de las referencias
                 for(int cont=0; cont<cantidadaRegistros; cont++) {

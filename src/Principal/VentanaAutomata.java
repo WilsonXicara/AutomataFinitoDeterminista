@@ -148,7 +148,7 @@ public class VentanaAutomata implements ActionListener {
         panel_cajas_estados.setBounds(100, 50, 50, 30*cantidadEstados);
         cajas_estados = new JTextField[cantidadEstados];
         for(int i=0; i<cantidadEstados; i++) {
-            cajas_estados[i] = new JTextField();
+            cajas_estados[i] = new JTextField(3);
             panel_cajas_estados.add(cajas_estados[i]);
         }
         panel_cajas_estados.setVisible(true);

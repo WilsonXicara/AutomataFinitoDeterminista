@@ -59,7 +59,9 @@ public class AutomataFD {
             Logger.getLogger(AutomataFD.class.getName()).log(Level.SEVERE, null, ex);
         }**/
 //        comparacionDeAutomatas(teclado);
-        concatenacionNulaACadena();
+//        concatenacionNulaACadena();
+        System.out.println("Carpeta = "+ManejoArchivo.CARPETA_AFD);
+        new ManejoArchivo();
     }
     public static void concatenacionNulaACadena() {
         String cadena = "Hola";
