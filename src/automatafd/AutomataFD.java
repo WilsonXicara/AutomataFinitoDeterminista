@@ -7,8 +7,10 @@ package automatafd;
 
 import Clases.*;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +58,18 @@ public class AutomataFD {
         } catch (IOException ex) {
             Logger.getLogger(AutomataFD.class.getName()).log(Level.SEVERE, null, ex);
         }**/
-        comparacionDeAutomatas(teclado);
+//        comparacionDeAutomatas(teclado);
+        concatenacionNulaACadena();
+    }
+    public static void concatenacionNulaACadena() {
+        String cadena = "Hola";
+        System.out.println("Cadena original = "+cadena);
+        int longitud = cadena.length();
+        for(int i=0; i<(8-longitud); i++) cadena = (char)0+cadena;
+        System.out.println("Cadena modificada = "+cadena);
+        String[] alfabeto = new String[5];
+        for(int i=0; i<5; i++) alfabeto[i] = Integer.toString(i);
+        for(int i=0; i<5; i++) System.out.println("Alfabeto["+i+"] = '"+alfabeto[i]+"'");
     }
     
     public static void compararAutomatas(Automata A1, Automata A2) {
@@ -104,9 +117,9 @@ public class AutomataFD {
             System.out.println(automatas[1].toString());**/
                 
             String cadena, continuar = "s";
-            new Graficos("Original", automatas[0]);
+//            new Graficos("Original", automatas[0]);
             automatas[1] = automatas[0].minimizar();
-            new Graficos("Minimizado", automatas[1]);
+//            new Graficos("Minimizado", automatas[1]);
             while (continuar.equals("n") == false) {
                 System.out.print("Automata a utlilizar: ");  int numeroAutomata = Integer.parseInt(teclado.readLine());
                 System.out.print("Cadena a probar = ");  cadena = teclado.readLine();

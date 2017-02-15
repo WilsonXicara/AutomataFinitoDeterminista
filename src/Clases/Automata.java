@@ -22,18 +22,71 @@ import java.util.logging.Logger;
  * @author Wilson Xicará
  */
 public class Automata {
-    private String[] alfabeto;
+    private String nombre, descripcion;
+    private String[] alfabeto, nombresEstados;
     private Estado[] estados;
     private int cantidadSimbolos, cantidadEstados;
     
     public Estado[] getEstados() { return this.estados; }
+    public String getNombre() { return nombre; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getDescripcion() { return descripcion; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public int getLongitudNombreEstados() {
+        if (nombresEstados[0].equals("") == true)
+            getNombresEstados();
+        int longitud = nombresEstados[0].length();
+        for(int i=1; i<cantidadEstados; i++) {
+            if (nombresEstados[i].length() > longitud)
+                longitud = nombresEstados[i].length();
+        }
+        return longitud;
+    }
+    public int getCantidadEstados() { return cantidadEstados; }
+    public String[] getNombresEstados() {
+        if (nombresEstados[0].equals("") == true)
+            for(int i=0; i<cantidadEstados; i++)
+                nombresEstados[i] = estados[i].getSimbolo();
+        return nombresEstados;
+    }
+    public int getIndiceEstadoInicial() {
+        Estado iterador;
+        for(int indice=0; indice<cantidadEstados; indice++) {
+            iterador = estados[indice];
+            if (iterador == getEstadoInicial())
+                return indice;
+        }
+        return 0;
+    }
+    public int[][] getMatrizTransiciones() {
+        int[][] matriz = new int[cantidadEstados][cantidadSimbolos];
+        Estado iterador, siguiente;
+        for(int fil=0; fil<cantidadEstados; fil++) {
+            iterador = estados[fil];
+            for(int col=0; col<cantidadSimbolos; col++) {
+                siguiente = iterador.siguienteEstado(col);
+                for(int busc=0; busc<cantidadEstados; busc++) {
+                    if (estados[busc] == siguiente) {
+                        matriz[fil][col] = busc;
+                        busc = cantidadEstados;
+                    }
+                }
+                
+            }
+        }
+        return matriz;
+    }
+    public void setEstados(Estado[] estados) { this.estados = estados; }
+    public void setNombresEstados(String[] nombresEstados) { this.nombresEstados = nombresEstados; }
+    
     
     /**
      * Constructor que inicializa un Autómata vacío (esto es, un alfabeto vacío y cero estados).
      */
     public Automata() {
-        this.alfabeto = null;
+        this.alfabeto = this.nombresEstados = null;
         this.estados = null;
+        this.nombre = null;
         this.cantidadSimbolos = this.cantidadEstados = 0;
     }
     /**
@@ -50,6 +103,8 @@ public class Automata {
         this.estados = new Estado[cantidadEstados];
         for(int i=0; i<cantidadEstados; i++)
             this.estados[i] = new Estado(this.cantidadSimbolos);
+        this.nombresEstados = new String[cantidadEstados];
+        for(int i=0; i<cantidadEstados; i++) this.nombresEstados[i] = "";
     }
     
     /**

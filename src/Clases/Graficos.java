@@ -5,6 +5,7 @@
  */
 package Clases;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.HeadlessException;
 import java.awt.Point;
@@ -12,47 +13,55 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.util.concurrent.ExecutionException;
 
 /**
  *
  * @author pc
  */
-public class Graficos extends JFrame{
+public class Graficos {
 
-    public Graficos(String nombreAutomata, Automata A) throws HeadlessException{
-        setSize(600,400);
-        setTitle("Dibujo Atumata \""+nombreAutomata+"\"");
-        setLocationRelativeTo(null);
-        setContentPane(new manejoDibujo(A));
-//        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        JButton boton= new JButton();
-        boton.setText("Salir");
-        boton.setBounds(135, 150, 130, 50);
-        boton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-        add(boton);
-        setVisible(true);
+    public Graficos(Automata A, String Direccion) {
+        IOGraficos gra  = new IOGraficos(A);
+        JFrame f =new JFrame("HOli");
+        f.setSize(400,400);
+        f.add(gra);
+        f.setVisible(true);
+        f.dispose();
+        try{guardar(gra, Direccion);}
+        catch(Exception e){
+            
+        }
     }
-     
+    public static BufferedImage screenShot(Component comp){
+        BufferedImage imagen = new BufferedImage(comp.getWidth(), comp.getHeight(),BufferedImage.TYPE_INT_ARGB);
+        comp.paint(imagen.getGraphics());
+        return imagen;
+        
+    }
+    public static void guardar(Component comp, String Direccion) throws Exception{
+        BufferedImage imagen = screenShot(comp);
+        ImageIO.write(imagen, "PNG", new File(Direccion));
+    }
 }
-
-class manejoDibujo extends JPanel{
+class IOGraficos  extends JPanel{
     private Estado[] estados;
     int cantidadEstados;
-    int x=10, y=175;
+    int x=10, y=100;
     Point a[], b[];
     String[] alfabeto;
     Color[] colores;
     
-    public manejoDibujo(Automata A){
+    public IOGraficos(Automata A){
         estados= A.getEstados();
         cantidadEstados = estados.length; 
         a = new Point[cantidadEstados]; b = new Point[cantidadEstados];
         alfabeto = A.getAlfabeto();
+        setBackground(Color.WHITE);
     }
     
      @Override
@@ -128,13 +137,9 @@ class manejoDibujo extends JPanel{
         for (int i = 0; i < alfabeto.length; i++) {
            int r= R.nextInt(255);
            int g= G.nextInt(255);
-           int b= B.nextInt(255);
+           int  bl= B.nextInt(255);
             B.ints(0, 255);
-            colores[i] = new Color(r, g, b);
+            colores[i] = new Color(r, g,  bl);
         }
     }
 }
-
-
-
-

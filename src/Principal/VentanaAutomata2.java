@@ -4,10 +4,6 @@
  * and open the template in the editor.
  */
 package Principal;
-import Clases.Automata;
-import Clases.Estado;
-import java.awt.Color;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,61 +13,36 @@ import javax.swing.*;
  *
  * @author jonathanmiranda
  */
-public class VentanaAutomata implements ActionListener {
-    /*Los utilizo para poder verificar que estado es inicial*/
-    JRadioButton[] etiqueta_estado_inicial;
-    int estado_inicial;
-    
-    private ActionListener identificar_estado_inicial = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            int a =0;
-            boolean encontrado = false;
-            while(encontrado !=true){
-                if(ae.getSource() == etiqueta_estado_inicial[a]){
-                    encontrado =true;
-                }
-                else a++;
-            }
-            etiqueta_estado_inicial[estado_inicial].setSelected(false);
-          estado_inicial = a;   
-       }
-    };
-    
-    /*Automata que se crea*/
-    Automata nuevo;
+public class VentanaAutomata2 implements ActionListener {
     /* Definicón de la ventana principal */
-    JDialog ventana;
+    JFrame ventana;
     
     /* Definición de Paneles Primarios */
     JPanel panel_alfabeto, panel_estados, panel_transiciones;
     /* Definición de Paneles Secundarios (Los que van dentro de un Primario) */
     JPanel panel_etiquetas_alfabeto, panel_cajas_alfabeto, panel_etiquetas_estados, panel_cajas_estados, panel_etiquetas_transiciones, panel_cajas_transiciones;
-    /*Panel para comprobar estado inicial*/
-    JPanel panel_estado_inicial;
     /* Definición de etiquetas */
     JLabel[] etiquetas_estados, etiquetas_transiciones;
     JLabel titulo_alfabeto, titulo_estados, titulo_transiciones;
     /* Definición de JTextFiel */
-    JTextField[] cajas_alfabeto, cajas_estados;
+    JTextField[] cajas_alfabeto, cajas_estados, cajas_transicion;
     /* Definición de ComboBox */
-    JComboBox[] tipo_estado,cajas_transicion;
+    JComboBox[] tipo_estado;
     
     /* Definición de los botones */
     JButton guardar_alfabeto_estados, guardar_transiciones;
     
     /* Definición de otras variables */
     int cantidadEstados, cantidadSimbolos;
+    String mensaje_error;
     String[] alfabeto, estados;
     
-    public VentanaAutomata(int cantidadEstados, int cantidadSimbolos){
-        ventana = new JDialog();
-        ventana.setModal(true);
+    public VentanaAutomata2(int cantidadEstados, int cantidadSimbolos){
+        ventana = new JFrame("Creación del Autómata");
         ventana.setLayout(null);
-        estado_inicial =0;   
+        
         this.cantidadEstados = cantidadEstados;
         this.cantidadSimbolos = cantidadSimbolos;
-        nuevo = new Automata();
         
         creacion_espacio_alfabeto_estados();
         
@@ -127,20 +98,12 @@ public class VentanaAutomata implements ActionListener {
         
         /* Inicialización de los paneles secundarios que se agregarán al 'panel_estados' */
         // Panel de las etiquetas "Simbolo {i} = ":
-        panel_estado_inicial = new JPanel(new GridLayout(cantidadEstados,1));
-        etiqueta_estado_inicial = new JRadioButton[cantidadEstados];
         panel_etiquetas_estados = new JPanel(new GridLayout(cantidadEstados, 1, 0, 0));
         panel_etiquetas_estados.setBounds(10, 50, 85, 20*cantidadEstados);
         JLabel[] etiqueta_estado = new JLabel[cantidadEstados];
         for(int i=0; i<cantidadEstados; i++) {
             etiqueta_estado[i] = new JLabel("Estado "+(i+1)+" = ");
             panel_etiquetas_estados.add(etiqueta_estado[i]);
-            if(i == 0) etiqueta_estado_inicial[i] = new JRadioButton("EI", true);
-            else  etiqueta_estado_inicial[i] = new JRadioButton("EI", false);
-            
-            etiqueta_estado_inicial[i].addActionListener(identificar_estado_inicial);
-            
-            panel_estado_inicial.add(etiqueta_estado_inicial[i]);
         }
         panel_etiquetas_estados.setVisible(true);
         // Panel de las entradas de texto para los Estados
@@ -156,11 +119,10 @@ public class VentanaAutomata implements ActionListener {
         /* Inicialización del 'panel_estados' que contendrá a los anteriores */
         titulo_estados = new JLabel("DEFINICIÓN DE LOS ESTADOS:");
         titulo_estados.setBounds(300, 10, 200, 30);
-        panel_estados = new JPanel(new GridLayout(1, 3, 10, 10));
-        panel_estados.setBounds(300, titulo_estados.getY()+titulo_estados.getHeight(), 220, 30*cantidadEstados);
+        panel_estados = new JPanel(new GridLayout(1, 2, 10, 10));
+        panel_estados.setBounds(300, titulo_estados.getY()+titulo_estados.getHeight(), 170, 30*cantidadEstados);
         panel_estados.add(panel_etiquetas_estados);
         panel_estados.add(panel_cajas_estados);
-        panel_estados.add(panel_estado_inicial);
         panel_estados.setVisible(true);
         
         ventana.add(titulo_estados);
@@ -187,7 +149,7 @@ public class VentanaAutomata implements ActionListener {
         // Panel de entradas de información de los estados (tipo y transiciones):
         panel_cajas_transiciones = new JPanel(new GridLayout(cantidad_etiquetas, 1, 0, 0));
         tipo_estado = new JComboBox[cantidadEstados];
-        cajas_transicion = new JComboBox[cantidadSimbolos*cantidadEstados];
+        cajas_transicion = new JTextField[cantidadSimbolos*cantidadEstados];
         contador = 0;
         for(int i=0; i<cantidadEstados; i++) {
             tipo_estado[i] = new JComboBox();
@@ -195,10 +157,7 @@ public class VentanaAutomata implements ActionListener {
             tipo_estado[i].addItem("Si");
             panel_cajas_transiciones.add(tipo_estado[i]);
             for(int j=0; j<cantidadSimbolos; j++) {
-                cajas_transicion[contador] = new JComboBox();
-                for (int k = 0; k < cantidadEstados; k++) {
-                    cajas_transicion[contador].addItem(cajas_estados[k].getText());
-                }
+                cajas_transicion[contador] = new JTextField();
                 panel_cajas_transiciones.add(cajas_transicion[contador]);
                 contador++;
             }
@@ -217,52 +176,53 @@ public class VentanaAutomata implements ActionListener {
         
         ventana.add(titulo_transiciones);
     }
-    private boolean esAlfabetoValido(String mensaje) {
+    private boolean esAlfabetoValido() {
         for(int cont=0; cont<cantidadSimbolos; cont++) {
             String simbolo = cajas_alfabeto[cont].getText();   // Obtengo el i-esimo simbolo
             if (simbolo.length() == 0) {
-                mensaje+="\nNo puede definir el Símbolo "+(cont+1)+" como nulo";
+                mensaje_error+="\nNo puede definir el Símbolo "+(cont+1)+" como nulo";
                 return false;
             }
             else if (simbolo.length() > 1) {
-                mensaje+="\nNo puede definir el Símbolo "+(cont+1)+" con más de un caracter";
+                mensaje_error+="\nNo puede definir el Símbolo "+(cont+1)+" con más de un caracter";
                 return false;
             }
             for(int cont2=cont+1; cont2<cantidadSimbolos; cont2++) {
                 String simbolo2 = cajas_alfabeto[cont2].getText();
                 if (simbolo2.equals(simbolo) == true) {
-                    mensaje+="\nLos Símbolos "+(cont+1)+" y "+(cont2+1)+" son iguales";
+                    mensaje_error+="\nLos Símbolos "+(cont+1)+" y "+(cont2+1)+" son iguales";
                     return false;
                 }
             }
         }
         return true;
     }
-    private boolean sonEstadosValidos(String mensaje) {
+    private boolean sonEstadosValidos() {
         for(int cont=0; cont<cantidadEstados; cont++) {
             String estado = cajas_estados[cont].getText();
             if (estado.length() == 0) {
-                mensaje+="\n";
+                mensaje_error+="\nNo puede definir el Estado "+(cont+1)+" como nulo";
                 return false;
             }
             for(int cont2=cont+1; cont2<cantidadEstados; cont2++) {
                 String estado2 = cajas_estados[cont2].getText();
-                if (estado2.equals(estado) == true)
+                if (estado2.equals(estado) == true) {
+                    mensaje_error+="\nLos Estados "+(cont+1)+" y "+(cont2+1)+"son iguales";
                     return false;
+                }
             }
         }
         return true;
     }
-    
     @Override
     public void actionPerformed(ActionEvent e) {
         // Cuando se quiere guardar el alfabeto: inicio la commprobación del mismo
         if (e.getSource() == guardar_alfabeto_estados) {
-            String mensaje = "Error.";
-            boolean alfabetoValido = esAlfabetoValido(mensaje);
-            boolean estadosValidos = sonEstadosValidos(mensaje);
+            mensaje_error = "Error.\n";
+            boolean alfabetoValido = esAlfabetoValido();
+            boolean estadosValidos = sonEstadosValidos();
             if (alfabetoValido == false || estadosValidos == false) {
-                JOptionPane.showMessageDialog(ventana, mensaje, "Error en Alfabeto o Estadeos", JOptionPane.ERROR_MESSAGE, null);
+                JOptionPane.showMessageDialog(ventana, mensaje_error, "Error en Alfabeto o Estadeos", JOptionPane.ERROR_MESSAGE, null);
             }
             else {
                 JOptionPane.showMessageDialog(ventana, "Alfabeto y Estados correctos", "Alfabeto y Estados guardado", JOptionPane.INFORMATION_MESSAGE, null);
@@ -293,89 +253,8 @@ public class VentanaAutomata implements ActionListener {
                 titulo_transiciones.setVisible(true);
                 panel_transiciones.setVisible(true);
                 guardar_alfabeto_estados.setVisible(false);
-                
-                guardar_transiciones.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                          Guardar_Automata();
-                    }
-                });
             }
         }
         
     }
-    
-    private void Guardar_Automata(){
-        /*Construir el alfabeto*/
-        String[] Alfabeto = new String[cajas_alfabeto.length];
-        for (int i = 0; i < alfabeto.length; i++) {
-            Alfabeto[i] = cajas_alfabeto[i].getText();
-        }
-        
-        /*Creo el arreglo de Estados*/
-        Estado[] Estados = new Estado[cajas_estados.length];
-        int c=1;
-        int b=0;
-        for (int i = 0; i < Estados.length; i++) {
-            Estado nuevo = new Estado(Alfabeto.length);
-            String tipo = (String)(tipo_estado[i].getSelectedItem());
-            nuevo.setSimbolo(cajas_estados[i].getText());
-                if(tipo.equals("Si")==true){
-                    nuevo.setAceptable(true);
-                }
-                else nuevo.setAceptable(false);
-            if(i != estado_inicial){
-               Estados[i] = nuevo;                
-               c++;
-            }
-            else{
-                Estados[0]= nuevo;
-                b=i;
-            }
-        }
-        
-        /*Conecto las transiciones*/
-        int N_caja_transicion =0;
-        for (int i = 0; i < Estados.length; i++) {
-           
-            for (int j = 0; j < Alfabeto.length; j++) {
-                int N_estado = 0;
-                String transicion = (String)cajas_transicion[N_caja_transicion].getSelectedItem();
-                transicion.replaceAll(" ", "");
-                boolean encontrado = false;
-                while(encontrado!=true){
-                    if(transicion.equals(Estados[N_estado].getSimbolo())== true){
-                        if(b!=0){
-                            if(i==0){
-                                Estados[b].setTransicion(j, Estados[N_estado]);
-                            }
-                            else{
-                                Estados[i].setTransicion(j, Estados[N_estado]);
-                            }
-                        
-                        }
-                        else Estados[i].setTransicion(j, Estados[N_estado]);
-                        
-                        encontrado = true;
-                    }
-                    else{
-                        N_estado++;
-                    }
-                }
-                N_caja_transicion++;
-            }
-        }
-        
-        /*Si el inicial no esta en la posicion 0 lo reacomodo*/
-        
-        nuevo = new Automata(Alfabeto, Estados.length);
-        
-        nuevo.setEstados(Estados);
-        ventana.dispose();
-    } 
-
-    public Automata getNuevo() {
-        return nuevo;
-    }
-    
 }

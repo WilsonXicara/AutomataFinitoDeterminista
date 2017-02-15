@@ -5,6 +5,13 @@
  */
 package Principal;
 import Clases.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -14,18 +21,28 @@ import javax.swing.JTextField;
  */
 public class Principal extends javax.swing.JFrame {
     int contador = 0;
+    int pos_G1=0, pos_G2=0;
+    Graficos G1,G2;
     JTextField[] cajas = new JTextField[5];
+    Ventana_crear_Automata aux;
+    ArrayList<Automata> Lista_Automatas;
+    ArrayList<String> posiciones_no_guardados,alfabeto_G1,alfabeto_G2, indices;
+    IndiceAutomatas[] indice;
+    ManejoArchivo archivo ;
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
-        String[] archivo = {"Nuevo autómata...","Modificar autómata..."};
+       /* String[] archivo = {"Nuevo autómata...","Modificar autómata..."};
         String[] editar = {"Comparar autómatas...", "Minimizar autómatas..."};
         for(int i=0; i<2; i++) {
-            this.menu_archivo.add(archivo[i]);
+       //     this.menu_archivo.add(archivo[i]);
             this.menu_editar.add(editar[i]);
-        }
+        }*/
+        Lista_Automatas = new ArrayList<Automata>();
+        archivo = new ManejoArchivo();
+        posiciones_no_guardados = alfabeto_G1 = alfabeto_G2 = indices = new ArrayList<String>();
     }
 
     /**
@@ -37,42 +54,203 @@ public class Principal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        Grafico1 = new javax.swing.JScrollPane();
+        Automatas1 = new javax.swing.JComboBox<>();
+        Grafico2 = new javax.swing.JScrollPane();
+        Automatas2 = new javax.swing.JComboBox<>();
+        equivalencia = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        descripcion_G1 = new javax.swing.JTextArea();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        descripcion_G2 = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        cadena_G1 = new javax.swing.JTextField();
+        Probar_G1 = new javax.swing.JButton();
+        cadena_G2 = new javax.swing.JTextField();
+        probar_G2 = new javax.swing.JButton();
+        guardar_G1 = new javax.swing.JButton();
+        mover_G1 = new javax.swing.JButton();
+        editar_G1 = new javax.swing.JButton();
+        borrar_G1 = new javax.swing.JButton();
+        minimizar_G1 = new javax.swing.JButton();
+        guardar_G2 = new javax.swing.JButton();
+        mover_G2 = new javax.swing.JButton();
+        editar_G2 = new javax.swing.JButton();
+        borrar_G2 = new javax.swing.JButton();
+        minimizar_G2 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         menu_archivo = new javax.swing.JMenu();
-        menu_editar = new javax.swing.JMenu();
+        Nuevo_automata = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+
+        jMenuItem2.setText("jMenuItem2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        Grafico1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        Automatas1.addContainerListener(new java.awt.event.ContainerAdapter() {
+            public void componentAdded(java.awt.event.ContainerEvent evt) {
+                Automatas1ComponentAdded(evt);
+            }
+        });
+        Automatas1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                Automatas1ItemStateChanged(evt);
             }
         });
 
-        jLabel1.setText("Cantidad Estados:");
-
-        jLabel2.setText("Cantidad Símbolos:");
-
-        jTextField1.setText("5");
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+        Automatas2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                Automatas2ItemStateChanged(evt);
             }
         });
 
-        jTextField2.setText("2");
+        equivalencia.setText("Equivalencia");
+        equivalencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                equivalenciaActionPerformed(evt);
+            }
+        });
+
+        descripcion_G1.setColumns(20);
+        descripcion_G1.setRows(5);
+        jScrollPane1.setViewportView(descripcion_G1);
+
+        descripcion_G2.setColumns(20);
+        descripcion_G2.setRows(5);
+        jScrollPane2.setViewportView(descripcion_G2);
+
+        jLabel1.setText("Cadena a Probar:");
+
+        jLabel2.setText("Cadena a Probar:");
+
+        cadena_G1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                cadena_G1KeyTyped(evt);
+            }
+        });
+
+        Probar_G1.setText("Probar");
+        Probar_G1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Probar_G1ActionPerformed(evt);
+            }
+        });
+
+        cadena_G2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                cadena_G2KeyTyped(evt);
+            }
+        });
+
+        probar_G2.setText("Probar");
+        probar_G2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                probar_G2ActionPerformed(evt);
+            }
+        });
+
+        guardar_G1.setText("Guardar");
+        guardar_G1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardar_G1ActionPerformed(evt);
+            }
+        });
+
+        mover_G1.setText("Mover Grafico");
+        mover_G1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mover_G1ActionPerformed(evt);
+            }
+        });
+
+        editar_G1.setText("Editar");
+        editar_G1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editar_G1ActionPerformed(evt);
+            }
+        });
+
+        borrar_G1.setText("Borrar");
+        borrar_G1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrar_G1ActionPerformed(evt);
+            }
+        });
+
+        minimizar_G1.setText("Minimizar");
+        minimizar_G1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minimizar_G1ActionPerformed(evt);
+            }
+        });
+
+        guardar_G2.setText("Guardar");
+        guardar_G2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardar_G2ActionPerformed(evt);
+            }
+        });
+
+        mover_G2.setText("Mover Grafico");
+        mover_G2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mover_G2ActionPerformed(evt);
+            }
+        });
+
+        editar_G2.setText("Editar");
+        editar_G2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editar_G2ActionPerformed(evt);
+            }
+        });
+
+        borrar_G2.setText("Borrar");
+        borrar_G2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                borrar_G2ActionPerformed(evt);
+            }
+        });
+
+        minimizar_G2.setText("Minimizar");
+        minimizar_G2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minimizar_G2ActionPerformed(evt);
+            }
+        });
 
         menu_archivo.setText("Archivo");
-        jMenuBar1.add(menu_archivo);
 
-        menu_editar.setText("Editar");
-        jMenuBar1.add(menu_editar);
+        Nuevo_automata.setText("Nuevo Automata");
+        Nuevo_automata.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Nuevo_automataActionPerformed(evt);
+            }
+        });
+        menu_archivo.add(Nuevo_automata);
+
+        jMenuItem1.setText("Abrir Automata");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        menu_archivo.add(jMenuItem1);
+
+        jMenuItem3.setText("Guardar Todo");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        menu_archivo.add(jMenuItem3);
+
+        jMenuBar1.add(menu_archivo);
 
         setJMenuBar(jMenuBar1);
 
@@ -81,47 +259,385 @@ public class Principal extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(113, 113, 113)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(editar_G1, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(mover_G1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(minimizar_G1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(guardar_G1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(borrar_G1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(jLabel1)
+                            .addGap(5, 5, 5)
+                            .addComponent(cadena_G1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(Probar_G1))
+                        .addComponent(jScrollPane1)
+                        .addComponent(Automatas1, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(Grafico1, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(46, 46, 46)
-                        .addComponent(jButton1)))
-                .addContainerGap(344, Short.MAX_VALUE))
+                        .addGap(15, 15, 15)
+                        .addComponent(equivalencia)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cadena_G2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(probar_G2))
+                            .addComponent(jScrollPane2)
+                            .addComponent(Automatas2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(Grafico2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(editar_G2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(mover_G2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(minimizar_G2, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(guardar_G2, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(borrar_G2, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(142, 142, 142)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(cadena_G1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Probar_G1)
+                    .addComponent(cadena_G2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(probar_G2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(Automatas1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Grafico1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(113, 113, 113)
+                                .addComponent(equivalencia))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(Automatas2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Grafico2, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(guardar_G1)
+                            .addComponent(borrar_G1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jButton1))
-                .addContainerGap(250, Short.MAX_VALUE))
+                            .addComponent(editar_G1)
+                            .addComponent(mover_G1)
+                            .addComponent(minimizar_G1)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(guardar_G2)
+                            .addComponent(borrar_G2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(editar_G2)
+                            .addComponent(mover_G2)
+                            .addComponent(minimizar_G2))))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        new VentanaAutomata(Integer.parseInt(jTextField1.getText()), Integer.parseInt(jTextField2.getText()));
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void Nuevo_automataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Nuevo_automataActionPerformed
+          aux = new Ventana_crear_Automata();
+          Automata nuevo = aux.getAutomata().getNuevo();
+/**       ManejoArchivo archivo = new ManejoArchivo();
+          archivo.guardarAutomata(nuevo);
+          archivo.guardarAutomata(nuevo2);
+          IndiceAutomatas[] referencias = archivo.obtenerReferencias();
+          System.out.println("IndiceAutomatas[0] = "+referencias[0].toString());
+          System.out.println("IndiceAutomatas[1] = "+referencias[1].toString());
+          archivo.eliminarAutomata(referencias[1]);
+//          archivo.eliminarAutomata(referencias[1]);**/
+          int posicion = Lista_Automatas.size();
+          Lista_Automatas.add(nuevo);
+          posiciones_no_guardados.add(Integer.toString(posicion));
+          Automatas1.addItem(nuevo.getNombre());
+          Automatas2.addItem(nuevo.getNombre());
+          
+    }//GEN-LAST:event_Nuevo_automataActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void Automatas1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_Automatas1ItemStateChanged
+                pos_G1 = Automatas1.getSelectedIndex();
+        Automata seleccionado = Lista_Automatas.get(pos_G1);
+        G1 = new Graficos(seleccionado,ManejoArchivo.CARPETA_IMAGENES + System.getProperty("file.separator") + seleccionado.getNombre()+ ".png");
+           BufferedImage ima = null;
+           try {
+             ima = ImageIO.read(new File(ManejoArchivo.CARPETA_IMAGENES + System.getProperty("file.separator") + seleccionado.getNombre()+ ".png"));
+            
+             JLabel imagen = new JLabel(new ImageIcon(ima));
+             Grafico1.setViewportView(imagen);
+            
+           } catch (Exception e) {
+          }
+           //guardo el alfabeto
+        for (int i = 0; i < seleccionado.getCantidadSimbolos(); i++) {
+            alfabeto_G1.add(seleccionado.getAlfabeto()[i]);
+        }
+           descripcion_G1.setText(seleccionado.getDescripcion());
+           
+           //verifico si el automata esta guardado
+           if(posiciones_no_guardados.contains(Integer.toString(pos_G1))==true){
+               guardar_G1.setEnabled(true);
+               borrar_G1.setText("Borrar");
+           }
+           else{
+               guardar_G1.setEnabled(false);
+               borrar_G1.setText("Eliminar");
+           }
+
+    }//GEN-LAST:event_Automatas1ItemStateChanged
+
+    private void Automatas2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_Automatas2ItemStateChanged
+         pos_G2 = Automatas2.getSelectedIndex();
+         Automata seleccionado = Lista_Automatas.get(pos_G2); 
+         G2 = new Graficos(seleccionado,ManejoArchivo.CARPETA_IMAGENES + System.getProperty("file.separator") + seleccionado.getNombre()+ ".png");
+           BufferedImage ima = null;
+           try {
+             ima = ImageIO.read(new File(ManejoArchivo.CARPETA_IMAGENES + System.getProperty("file.separator") + seleccionado.getNombre()+ ".png"));
+            
+             JLabel imagen = new JLabel(new ImageIcon(ima));
+             Grafico2.setViewportView(imagen);
+            
+           } catch (Exception e) {
+          }
+           for (int i = 0; i < seleccionado.getCantidadSimbolos(); i++) {
+            alfabeto_G2.add(seleccionado.getAlfabeto()[i]);
+        }
+           descripcion_G2.setText(seleccionado.getDescripcion());
+           
+           //verifico si el automata esta guardado
+           if(posiciones_no_guardados.contains(Integer.toString(pos_G2))==true){
+               guardar_G2.setEnabled(true);
+               borrar_G2.setText("Borrar");
+           }
+           else{
+               guardar_G2.setEnabled(false);
+               borrar_G2.setText("Eliminar");
+           }
+
+    }//GEN-LAST:event_Automatas2ItemStateChanged
+
+    private void Automatas1ComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_Automatas1ComponentAdded
+        
+    }//GEN-LAST:event_Automatas1ComponentAdded
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        for (int i = 0; i < posiciones_no_guardados.size(); i++) {
+            archivo.guardarAutomata(Lista_Automatas.get(Integer.parseInt(posiciones_no_guardados.get(i))));
+        }posiciones_no_guardados.clear();
+        indice = archivo.obtenerReferencias();
+        indices = new ArrayList<String>();
+        for (IndiceAutomatas indice1 : indice) {
+            indices.add(indice1.getNombreAutomata());
+        }
+        
+
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void equivalenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_equivalenciaActionPerformed
+         AlgoritmoMoore a = new AlgoritmoMoore();
+         if(a.compararAutomatas(Lista_Automatas.get(pos_G1), Lista_Automatas.get(pos_G2))==true){
+             JOptionPane.showMessageDialog(this, "Los automatas son equivalentes", "Mensaje", JOptionPane.INFORMATION_MESSAGE, null);
+         }
+         else{
+             JOptionPane.showMessageDialog(this, "Los automatas no son equivalentes", "Mensaje", JOptionPane.ERROR_MESSAGE, null);
+         }
+    }//GEN-LAST:event_equivalenciaActionPerformed
+
+    private void cadena_G1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cadena_G1KeyTyped
+        if(alfabeto_G1.contains(String.valueOf(evt.getKeyChar()))==false){
+              evt.consume();
+        }
+    }//GEN-LAST:event_cadena_G1KeyTyped
+
+    private void cadena_G2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cadena_G2KeyTyped
+        if(alfabeto_G2.contains(String.valueOf(evt.getKeyChar()))==false){
+              evt.consume();
+        }
+    }//GEN-LAST:event_cadena_G2KeyTyped
+
+    private void Probar_G1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Probar_G1ActionPerformed
+        String cadena = cadena_G1.getText();
+        if(Lista_Automatas.get(pos_G1).probarCadena(cadena)==true){
+            JOptionPane.showMessageDialog(this, "La cadena pertenece al lenguaje", "Aviso", JOptionPane.INFORMATION_MESSAGE, null);
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "La cadena no pertenece al lenguaje", "Aviso", JOptionPane.INFORMATION_MESSAGE, null);
+        }
+    }//GEN-LAST:event_Probar_G1ActionPerformed
+
+    private void probar_G2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_probar_G2ActionPerformed
+         String cadena = cadena_G2.getText();
+        if(Lista_Automatas.get(pos_G2).probarCadena(cadena)==true){
+            JOptionPane.showMessageDialog(this, "La cadena pertenece al lenguaje", "Aviso", JOptionPane.INFORMATION_MESSAGE, null);
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "La cadena no pertenece al lenguaje", "Aviso", JOptionPane.INFORMATION_MESSAGE, null);
+        }
+    }//GEN-LAST:event_probar_G2ActionPerformed
+
+    private void guardar_G1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardar_G1ActionPerformed
+        archivo.guardarAutomata(Lista_Automatas.get(pos_G1));
+        posiciones_no_guardados.remove(Integer.toString(pos_G1));
+        indice = archivo.obtenerReferencias();
+        indices = new ArrayList<String>();
+        for (int i = 0; i < indice.length; i++) {
+            indices.add(indice[i].getNombreAutomata());
+        }
+        guardar_G1.setEnabled(false);
+        borrar_G1.setText("Eliminar");
+    }//GEN-LAST:event_guardar_G1ActionPerformed
+
+    private void guardar_G2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardar_G2ActionPerformed
+        archivo.guardarAutomata(Lista_Automatas.get(pos_G2));
+        posiciones_no_guardados.remove(Integer.toString(pos_G2));
+        indice = archivo.obtenerReferencias();
+        indices = new ArrayList<String>();
+        for (int i = 0; i < indice.length; i++) {
+            indices.add(indice[i].getNombreAutomata());
+        }
+        guardar_G2.setEnabled(false);
+        borrar_G2.setText("Eliminar");
+    }//GEN-LAST:event_guardar_G2ActionPerformed
+
+    private void borrar_G1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrar_G1ActionPerformed
+        if(posiciones_no_guardados.contains(Integer.toString(pos_G1))==true){
+            Automatas1.removeItemAt(pos_G1);
+            Automatas2.removeItem(Lista_Automatas.get(pos_G1));
+            Lista_Automatas.remove(pos_G1);
+        }
+        else{
+            archivo.eliminarAutomata(indice[indices.indexOf(Lista_Automatas.get(pos_G1).getNombre())]);
+            indice = archivo.obtenerReferencias();
+            indices = new ArrayList<String>();
+            for (int i = 0; i < indice.length; i++) {
+                indices.add(indice[i].getNombreAutomata());
+            }
+            Automatas1.removeItemAt(pos_G1);
+            Automatas2.removeItem(Lista_Automatas.get(pos_G1));
+            Lista_Automatas.remove(pos_G1);
+        }
+    }//GEN-LAST:event_borrar_G1ActionPerformed
+
+    private void borrar_G2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_borrar_G2ActionPerformed
+         if(posiciones_no_guardados.contains(Integer.toString(pos_G2))==true){
+            Lista_Automatas.remove(pos_G2);
+            Automatas1.removeItem(Lista_Automatas.get(pos_G2));
+            Automatas2.removeItemAt(pos_G2);
+        }
+        else{
+            archivo.eliminarAutomata(indice[indices.indexOf(Lista_Automatas.get(pos_G2).getNombre())]);
+            indice = archivo.obtenerReferencias();
+            indices = new ArrayList<String>();
+            for (int i = 0; i < indice.length; i++) {
+                indices.add(indice[i].getNombreAutomata());
+            }
+            Automatas1.removeItem(Lista_Automatas.get(pos_G2));
+            Automatas2.removeItemAt(pos_G2);
+            Lista_Automatas.remove(pos_G2);
+        }
+    }//GEN-LAST:event_borrar_G2ActionPerformed
+
+    private void minimizar_G1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minimizar_G1ActionPerformed
+        Ventana_Minimizar a = new Ventana_Minimizar(Lista_Automatas.get(pos_G1));
+        Automata nuevo = a.getNuevo();
+        int posicion = Lista_Automatas.size();
+          Lista_Automatas.add(nuevo);
+          posiciones_no_guardados.add(Integer.toString(posicion));
+          Automatas1.addItem(nuevo.getNombre());
+          Automatas2.addItem(nuevo.getNombre());
+        
+    }//GEN-LAST:event_minimizar_G1ActionPerformed
+
+    private void minimizar_G2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minimizar_G2ActionPerformed
+        Ventana_Minimizar a = new Ventana_Minimizar(Lista_Automatas.get(pos_G2));
+        Automata nuevo = a.getNuevo();
+        int posicion = Lista_Automatas.size();
+          Lista_Automatas.add(nuevo);
+          posiciones_no_guardados.add(Integer.toString(posicion));
+          Automatas1.addItem(nuevo.getNombre());
+          Automatas2.addItem(nuevo.getNombre());
+    }//GEN-LAST:event_minimizar_G2ActionPerformed
+
+    private void editar_G1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editar_G1ActionPerformed
+        Ventana_Editar a = new Ventana_Editar(Lista_Automatas.get(pos_G1));
+        Automata nuevo = a.getNuevo();
+        if(posiciones_no_guardados.contains(Integer.toString(pos_G1))==true){
+            Lista_Automatas.set(pos_G1, nuevo);
+        }
+        else{
+            int b = indices.indexOf(Lista_Automatas.get(pos_G1).getNombre());
+            archivo.eliminarAutomata(indice[b]);
+            archivo.guardarAutomata(nuevo);
+            indice = archivo.obtenerReferencias();
+            indices = new ArrayList<String>();
+            for (int i = 0; i < indice.length; i++) {
+                indices.add(indice[i].getNombreAutomata());
+            }
+            
+        }
+    }//GEN-LAST:event_editar_G1ActionPerformed
+
+    private void editar_G2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editar_G2ActionPerformed
+         Ventana_Editar a = new Ventana_Editar(Lista_Automatas.get(pos_G2));
+        Automata nuevo = a.getNuevo();
+        if(posiciones_no_guardados.contains(Integer.toString(pos_G2))==true){
+            Lista_Automatas.set(pos_G2, nuevo);
+        }
+        else{
+            int b = indices.indexOf(Lista_Automatas.get(pos_G2).getNombre());
+            archivo.eliminarAutomata(indice[b]);
+            archivo.guardarAutomata(nuevo);
+            indice = archivo.obtenerReferencias();
+            indices = new ArrayList<String>();
+            for (int i = 0; i < indice.length; i++) {
+                indices.add(indice[i].getNombreAutomata());
+            }
+            
+        }
+    }//GEN-LAST:event_editar_G2ActionPerformed
+
+    private void mover_G1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mover_G1ActionPerformed
+           G1.mover(ManejoArchivo.CARPETA_IMAGENES + System.getProperty("file.separator") + Lista_Automatas.get(pos_G1).getNombre() + ".png");
+    }//GEN-LAST:event_mover_G1ActionPerformed
+
+    private void mover_G2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mover_G2ActionPerformed
+           G2.mover(ManejoArchivo.CARPETA_IMAGENES + System.getProperty("file.separator") + Lista_Automatas.get(pos_G2).getNombre()  + ".png");
+    }//GEN-LAST:event_mover_G2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -149,6 +665,7 @@ public class Principal extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Principal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -159,13 +676,36 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<String> Automatas1;
+    private javax.swing.JComboBox<String> Automatas2;
+    private javax.swing.JScrollPane Grafico1;
+    private javax.swing.JScrollPane Grafico2;
+    private javax.swing.JMenuItem Nuevo_automata;
+    private javax.swing.JButton Probar_G1;
+    private javax.swing.JButton borrar_G1;
+    private javax.swing.JButton borrar_G2;
+    private javax.swing.JTextField cadena_G1;
+    private javax.swing.JTextField cadena_G2;
+    private javax.swing.JTextArea descripcion_G1;
+    private javax.swing.JTextArea descripcion_G2;
+    private javax.swing.JButton editar_G1;
+    private javax.swing.JButton editar_G2;
+    private javax.swing.JButton equivalencia;
+    private javax.swing.JButton guardar_G1;
+    private javax.swing.JButton guardar_G2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JMenu menu_archivo;
-    private javax.swing.JMenu menu_editar;
+    private javax.swing.JButton minimizar_G1;
+    private javax.swing.JButton minimizar_G2;
+    private javax.swing.JButton mover_G1;
+    private javax.swing.JButton mover_G2;
+    private javax.swing.JButton probar_G2;
     // End of variables declaration//GEN-END:variables
 }
